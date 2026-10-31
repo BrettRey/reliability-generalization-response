@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0",
+  "sha256": "36689aead4e008a07fcdc699c0c692dcfa64a630d65c7bb186f17ed3019f310d",
+  "sources": {
+    "app.js": "e54628c00a175d34e1cbc59d97f3b6efb746d68d7d76b9e95b578c914d4c3700",
+    "core.js": "f816ddcd1e6353273cccdccb447caa9dc99e7452e06fbd5d09d3e3d30ff61b46",
+    "page.html": "602d5313037167d5d81f9fbfff5f3562e250846456026b8ad8357628aaeec73a",
+    "style.css": "53647990d88e3e00746e58c30d5ee4a141efa0849f763b4087a9b4aa1127ea16"
+  }
+}

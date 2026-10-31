@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Compare Pearson correlation and exact agreement by editing four pairs of event counts, following the calculations, and constructing counterexamples.">
+  <meta name="color-scheme" content="light">
+  <link rel="canonical" href="https://brettreynolds.ca/correlation-and-agreement/">
+  <meta property="og:title" content="Correlation and agreement: same scores, different summaries">
+  <meta property="og:description" content="An interactive guide to what Pearson correlation and exact agreement retain from four pairs of counts.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://brettreynolds.ca/correlation-and-agreement/">
+  <link rel="icon" href="data:,">
+  <title>Correlation and agreement · Same scores, different summaries · Brett Reynolds</title>
+  <style>/* STYLE */</style>
+</head>
+<body>
+<a href="#counts" class="skip-link">Skip to editable counts</a>
+<main>
+  <header>
+    <p class="small"><a href="https://brettreynolds.ca/#resources">Brett Reynolds · Teaching and research resources</a></p>
+    <p class="eyebrow">Interactive supplement / synthetic teaching example</p>
+    <h1>Same scores, different summaries</h1>
+    <p class="deck">Two observers counted events in four clips. Change B and see what each summary retains.</p>
+  </header>
+  <noscript><p class="notice">Enable JavaScript to edit the counts. The examples below remain readable: identical counts give r = 1 and four exact matches; adding one to every B count preserves r = 1 with no exact matches; reversing B gives r = −1 with no exact matches.</p></noscript>
+  <div class="views" role="tablist" aria-label="Activity">
+    <button id="tab-compare" role="tab" aria-selected="true" aria-controls="view-compare" data-view="compare">Compare</button>
+    <button id="tab-calculation" role="tab" aria-selected="false" aria-controls="view-calculation" tabindex="-1" data-view="calculation">Follow the calculation</button>
+    <button id="tab-backwards" role="tab" aria-selected="false" aria-controls="view-backwards" tabindex="-1" data-view="backwards">Work backwards</button>
+  </div>
+    <div id="summary" class="summary" role="region" aria-label="Current summaries">
+      <div><span class="stat-label">Pearson correlation</span><strong id="r-value">r = 1</strong> <span id="r-qualifier">(exact)</span></div>
+      <div><span class="stat-label">Exact matches</span><strong id="agreement-value">4/4 (100%)</strong></div>
+      <div id="within-summary" hidden><span class="stat-label">Within one count</span><strong id="within-value">4/4 (100%)</strong></div>
+      <p id="validity-note" class="validity-note" hidden>Summaries show the last valid counts. Correct the marked input.</p>
+    </div>
+  <section class="data-stage" aria-label="Shared current counts">
+    <div class="data-columns">
+      <section id="counts" tabindex="-1" aria-labelledby="counts-heading">
+        <div class="counts-heading"><div><h2 id="counts-heading">Current counts</h2><p id="current-vector" class="muted">B: 1, 2, 3, 4 · Same counts</p></div><button id="shift">Add 1 to B</button></div>
+        <p class="invitation" id="first-prompt">If every B count goes up by one, what happens to correlation and exact matches?</p>
+        <table class="counts-table"><caption class="sr-only">Event counts for four clips. Observer A is fixed; Observer B is editable.</caption>
+          <thead><tr><th scope="col">Clip</th><th scope="col">A <span class="small">fixed</span></th><th scope="col">B <span class="small">editable</span></th><th scope="col">Exact?</th></tr></thead>
+          <tbody id="count-rows"></tbody>
+        </table>
+        <p class="muted small">Teaching range: whole numbers 1–7. A is fixed to make comparisons easy. Neither observer is assumed to be correct.</p>
+        <div class="actions"><button id="reset">Reset B to 1, 2, 3, 4</button><button id="save">Save current example</button><button id="undo" disabled>Undo counts</button></div>
+        <p id="save-limit" class="small muted" hidden>Two examples are saved. Remove one below to save another.</p>
+        <div class="preset-block"><label for="preset">Load an example</label><select id="preset"></select></div>
+      </section>
+      <figure class="plot"><h2>Each point is one clip</h2><div id="plot"></div><figcaption id="plot-caption">The dashed line marks equal counts. Point numbers identify clips; a second ring marks an exact match.</figcaption></figure>
+    </div>
+    <p id="last-change" class="change-note">All four pairs match exactly.</p>
+    <label class="rule-toggle"><input id="within-toggle" type="checkbox"> Add within-one agreement: |A − B| ≤ 1</label>
+    <p id="rule-explanation" class="muted small" hidden>This counts a difference of one as agreement. It asks a different question; exact agreement is still shown.</p>
+  </section>
+
+  <section id="view-compare" class="activity" role="tabpanel" aria-labelledby="tab-compare" tabindex="0">
+    <h2>What changes when the counts change?</h2>
+    <p>Try the one-count shift, then reverse B's order. Correlation summarizes linear association after centring and scaling. Exact agreement counts the pairs with identical values.</p>
+    <p>A coefficient usually permits several sets of observations. Even when it identifies the counts within this teaching domain, it doesn't establish whether either observer's counts are accurate.</p>
+    <button class="text-button" data-go="calculation">Follow these counts through the formulas →</button>
+  </section>
+
+  <section id="view-calculation" class="activity" role="tabpanel" aria-labelledby="tab-calculation" tabindex="0" hidden>
+    <h2>Follow the calculation</h2>
+    <div class="path-controls" role="group" aria-label="Calculation path"><button id="path-correlation" aria-pressed="true" data-path="correlation">Follow correlation</button><button id="path-agreement" aria-pressed="false" data-path="agreement">Follow exact agreement</button></div>
+    <h3 id="step-heading"></h3><p id="step-intro"></p>
+    <div class="calculation-grid"><div id="ledger" class="table-scroll" tabindex="0" role="region" aria-label="Calculation table"></div><aside id="contribution" class="contribution" aria-label="Selected clip contribution"></aside></div>
+    <div id="formula-result" class="formula-result"></div>
+    <div class="actions"><button id="previous">Previous</button><button id="next">Next</button></div>
+    <details class="technical"><summary>The formulas and what they retain</summary>
+      <div class="formula-scroll" tabindex="0" role="region" aria-label="Pearson correlation formula">
+        <math display="block" aria-label="r equals the sum of centred A times centred B divided by the square root of the product of their two sums of squared deviations"><mrow><mi>r</mi><mo>=</mo><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>4</mn></munderover><mo>(</mo><msub><mi>A</mi><mi>i</mi></msub><mo>−</mo><mover><mi>A</mi><mo>¯</mo></mover><mo>)</mo><mo>(</mo><msub><mi>B</mi><mi>i</mi></msub><mo>−</mo><mover><mi>B</mi><mo>¯</mo></mover><mo>)</mo></mrow><msqrt><mrow><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>4</mn></munderover><msup><mrow><mo>(</mo><msub><mi>A</mi><mi>i</mi></msub><mo>−</mo><mover><mi>A</mi><mo>¯</mo></mover><mo>)</mo></mrow><mn>2</mn></msup><mo>×</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>4</mn></munderover><msup><mrow><mo>(</mo><msub><mi>B</mi><mi>i</mi></msub><mo>−</mo><mover><mi>B</mi><mo>¯</mo></mover><mo>)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mfrac></mrow></math>
+      </div>
+      <p>Correlation uses the sum of cross-products and both sums of squares. Adding a constant or multiplying by a positive constant throughout either series preserves r, when it is defined. Rescaling all counts is different from changing the sampled population's range.</p>
+      <p class="plain-formula">Exact agreement = 100 × (number of pairs with Aᵢ = Bᵢ) ÷ 4.</p>
+      <p>Each pair becomes 1 for a match or 0 for a mismatch. Totals of one, two, or three don't identify which clips matched. Zero means all pairs differ; four means all pairs match and B is identical to A. Mismatch sizes are discarded. Exact matching is the chosen rule for these integer counts.</p>
+    </details>
+  </section>
+
+  <section id="view-backwards" class="activity" role="tabpanel" aria-labelledby="tab-backwards" tabindex="0" hidden>
+    <h2>Work backwards from a summary</h2>
+    <p>Edit the counts above and save examples to compare them. A summary restricts the possibilities without usually identifying a unique dataset.</p>
+    <ol class="tasks">
+      <li><h3>Keep r exactly 1 and remove every exact match.</h3><p id="task-one"></p><details><summary>Show one solution</summary><button data-load="2,3,4,5">Load B: 2, 3, 4, 5</button></details></li>
+      <li><h3>Keep the match count and make a mismatch larger.</h3><p>Save a starting example, then change B while preserving its number of exact matches. Compare the largest absolute difference.</p><p id="task-two"></p><details><summary>Show a starting pair</summary><div class="actions"><button data-load="1,2,3,5">Load B: 1, 2, 3, 5</button><button data-load="1,2,3,7">Load B: 1, 2, 3, 7</button></div></details></li>
+      <li><h3>Find positive and negative correlations with two exact matches.</h3><p>Save one of each to see them together.</p><p id="task-three"></p><details><summary>Show one pair</summary><div class="actions"><button data-load="1,2,4,3">Load B: 1, 2, 4, 3</button><button data-load="4,2,3,1">Load B: 4, 2, 3, 1</button></div></details></li>
+    </ol>
+    <details id="enumeration" class="technical"><summary>All 2,401 possibilities in this teaching domain</summary>
+      <p>A stays (1, 2, 3, 4); each B count is an integer from 1 to 7. These are compatible possibilities. <strong>No probabilities have been assigned to them.</strong> The counts say nothing about how often such data occurs in research.</p>
+      <p id="enumeration-totals"></p><label for="witness-filter">Show examples compatible with</label><select id="witness-filter"><option value="positive">r exactly 1</option><option value="negative">r exactly −1</option><option value="two">Exactly two matches</option><option value="undefined">Undefined correlation</option><option value="four">Exactly four matches</option></select>
+      <p id="witness-count"></p><div id="witnesses"></div><div class="actions"><button id="witness-previous">Previous examples</button><button id="witness-next">Next examples</button></div>
+      <p class="small muted">Examples are listed in numerical order, without any likelihood ranking. Exact checks use integer sums before rounding. A published r rounded to two places permits additional values; this is not a solver for rounded published coefficients.</p>
+      <p>Four exact matches identify B uniquely here and imply r = 1 because A varies. Knowing r = 1 permits five different B vectors, with zero, one, or four exact matches.</p>
+    </details>
+  </section>
+
+  <section id="saved-section" class="saved-section" aria-labelledby="saved-heading" hidden><h2 id="saved-heading">Current and saved examples</h2><p>Saved examples stay unchanged as you edit. Loading one copies it into the current counts.</p><div id="saved-table" class="table-scroll" tabindex="0" role="region" aria-label="Current and saved comparison"></div><p id="saved-comparison"></p></section>
+  <footer><p>Supplement to <cite>What generalizes in reliability generalization?</cite> · Brett Reynolds · Version <span id="version">1.0.0</span></p><p>These four pairs are constructed examples, not observations from engagement research. The page illustrates properties of summaries; it does not assess measurement adequacy.</p><p><a id="offline-download" href="index.html" download="correlation-and-agreement-1.0.0.html">Download the offline page</a> <span class="muted">· No account or connection needed after download</span></p></footer>
+</main>
+<div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+<script>/* CORE */</script>
+<script>/* APP */</script>
+</body>
+</html>

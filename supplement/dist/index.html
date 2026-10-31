@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Compare Pearson correlation and exact agreement by editing four pairs of event counts, following the calculations, and constructing counterexamples.">
+  <meta name="color-scheme" content="light">
+  <link rel="canonical" href="https://brettreynolds.ca/correlation-and-agreement/">
+  <meta property="og:title" content="Correlation and agreement: same scores, different summaries">
+  <meta property="og:description" content="An interactive guide to what Pearson correlation and exact agreement retain from four pairs of counts.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://brettreynolds.ca/correlation-and-agreement/">
+  <link rel="icon" href="data:,">
+  <title>Correlation and agreement · Same scores, different summaries · Brett Reynolds</title>
+  <style>:root { --bg:#fbf9f4; --paper:#fff; --ink:#1c1917; --muted:#57534e; --accent:#6b1f2a; --border:#8a8378; --line:#d6d0c4; --tint:#f1e8e5; }
+* { box-sizing:border-box; }
+html { scroll-padding-top:calc(var(--summary-height, 110px) + 16px); }
+body { margin:0; background:var(--bg); color:var(--ink); font:18px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-variant-numeric:lining-nums tabular-nums; }
+main { max-width:1240px; margin:auto; padding:32px 48px 24px; }
+h1,h2,h3 { font-family:Georgia,"Iowan Old Style",serif; font-weight:400; line-height:1.25; }
+h1 { font-size:36px; margin:12px 0; }
+h2 { font-size:25px; margin:0 0 12px; }
+h3 { font-size:22px; margin:20px 0 12px; }
+p { margin:10px 0 18px; }
+header .deck { max-width:72ch; }
+.eyebrow { font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin:0; }
+button,input,select { font:inherit; color:inherit; }
+button,select { background:var(--paper); border:1px solid var(--border); border-radius:4px; min-height:44px; padding:8px 15px; font-size:16px; cursor:pointer; }
+button:hover,select:hover { background:var(--tint); }
+button:disabled { color:var(--muted); border-style:dashed; cursor:default; background:transparent; }
+button[aria-selected="true"],button[aria-pressed="true"] { background:var(--tint); color:var(--accent); border-color:var(--accent); font-weight:650; }
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible,[tabindex="0"]:focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+[hidden] { display:none !important; }
+a { color:var(--accent); text-underline-offset:3px; }
+.views,.path-controls,.actions { display:flex; flex-wrap:wrap; gap:8px; }
+.views { margin:24px 0; padding-bottom:20px; border-bottom:1px solid var(--line); }
+.views button { padding:10px 22px; }
+.summary { position:sticky; top:0; z-index:5; background:var(--paper); border:1px solid var(--border); border-radius:4px; padding:12px 16px; display:flex; flex-wrap:wrap; gap:10px 24px; box-shadow:0 4px 0 var(--bg); margin-bottom:24px; }
+.summary>div { flex:1; min-width:160px; }
+.summary>div+div { border-left:1px solid var(--line); padding-left:24px; }
+.stat-label { display:block; font-size:15px; color:var(--muted); margin-bottom:2px; }
+.summary strong { font-size:24px; font-weight:650; }
+#r-qualifier { font-size:14px; color:var(--muted); }
+.validity-note { flex-basis:100%; font-size:14px; margin:0; color:var(--accent); }
+.data-columns { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:56px; }
+.counts-heading { display:flex; gap:12px; justify-content:space-between; align-items:flex-start; }
+.counts-heading button { flex-shrink:0; }
+#current-vector { font-size:15px; margin:0 0 12px; }
+.invitation { font-size:16px; }
+table { width:100%; border-collapse:collapse; text-align:left; }
+th { font-weight:500; font-size:15px; color:var(--muted); }
+th,td { padding:9px 8px; border-bottom:1px solid var(--line); }
+th[scope="row"] { font-size:18px; color:var(--ink); }
+.counts-table td,.counts-table th { padding:8px 4px; }
+.small { font-size:15px; }
+.muted { color:var(--muted); }
+.count-editor { display:flex; align-items:center; gap:8px; }
+.count-editor button { width:44px; padding:0; font-size:23px; flex-shrink:0; }
+.count-editor input { width:48px; height:44px; border:1px solid var(--border); border-radius:4px; text-align:center; padding:4px; font-size:20px; background:var(--paper); -moz-appearance:textfield; }
+.count-editor input::-webkit-inner-spin-button,.count-editor input::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+.count-editor input[aria-invalid="true"] { border:2px dashed var(--accent); }
+.input-error { color:var(--accent); font-size:13px; max-width:160px; margin:4px 0; }
+.clip-button { padding:0; min-width:44px; border-color:transparent; background:transparent; font-size:18px; }
+.selected-row { background:var(--tint); box-shadow:inset 3px 0 var(--accent); }
+.selected-row th,.selected-row td { font-weight:650; }
+.match-symbol { font-size:22px; }
+.match-word { font-size:13px; display:block; }
+.preset-block { margin:20px 0 8px; }
+.preset-block label { display:block; font-size:15px; color:var(--muted); margin-bottom:6px; }
+.preset-block select { width:100%; max-width:100%; }
+.plot { margin:0; min-width:0; }
+.plot svg { width:100%; height:auto; display:block; overflow:visible; }
+.plot figcaption { font-size:14px; color:var(--muted); margin-top:10px; }
+.plot .point { cursor:pointer; }
+.plot .point:focus { outline:none; }
+.plot .point:focus circle { stroke:var(--accent); stroke-width:4; }
+.change-note { margin:22px 0 12px; min-height:28px; }
+.rule-toggle { display:flex; align-items:center; gap:10px; font-size:16px; min-height:44px; cursor:pointer; width:fit-content; }
+input[type="checkbox"] { width:22px; height:22px; accent-color:var(--accent); flex-shrink:0; }
+.activity { border-top:1px solid var(--line); margin-top:28px; padding-top:28px; }
+.activity>p { max-width:75ch; }
+.text-button { border:0; color:var(--accent); text-decoration:underline; padding-left:0; background:none; }
+.calculation-grid { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,1fr); gap:40px; margin:22px 0; }
+.table-scroll,.formula-scroll { overflow-x:auto; max-width:100%; }
+.table-scroll table { min-width:310px; }
+.contribution { border:1px solid var(--line); background:var(--paper); border-radius:4px; padding:20px; }
+.contribution h3 { font:650 18px/1.4 system-ui,sans-serif; margin:0 0 14px; }
+.contribution .arithmetic { font-size:23px; overflow-wrap:anywhere; }
+.formula-result { margin:18px 0; overflow-wrap:anywhere; }
+.formula-result strong { font-size:21px; }
+.technical { border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:16px 0; margin:28px 0 0; }
+summary { cursor:pointer; color:var(--accent); min-height:44px; padding:8px 4px; }
+details>p,details>.actions,details>button { margin-top:14px; }
+math { padding:16px 8px; min-width:460px; }
+.plain-formula { font-size:19px; }
+.tasks { padding-left:26px; }
+.tasks li { padding:0 0 24px 4px; }
+.tasks h3 { font-size:22px; }
+.tasks p { max-width:72ch; }
+.task-status { font-weight:600; }
+#witness-filter { display:block; margin:8px 0; max-width:100%; }
+.witness { display:flex; align-items:center; flex-wrap:wrap; gap:8px 20px; border-bottom:1px solid var(--line); padding:10px 0; font-size:16px; }
+.witness span { flex:1; }
+#witnesses { margin-bottom:14px; }
+.saved-section { margin-top:32px; border-top:1px solid var(--line); padding-top:24px; }
+.saved-section table { min-width:500px; }
+.saved-section th,.saved-section td { vertical-align:top; }
+.saved-section th:not(:first-child),.saved-section td:not(:first-child) { border-left:1px dashed var(--border); }
+.saved-section td:nth-child(2),.saved-section th:nth-child(2) { border-left-style:solid; }
+.saved-label { display:block; font-size:13px; font-weight:400; margin-top:4px; }
+footer { margin-top:40px; padding-top:20px; border-top:1px solid var(--line); font-size:14px; color:var(--muted); }
+footer p { max-width:90ch; }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+.skip-link { position:absolute; top:-100px; left:16px; background:var(--paper); padding:10px; z-index:20; }
+.skip-link:focus { top:10px; }
+@media(max-width:900px) { main { padding:24px; } .data-columns { gap:24px; } .count-editor { gap:5px; } .count-editor input { width:44px; } .counts-heading { flex-wrap:wrap; } }
+@media(max-width:720px) {
+  main { padding:20px 18px; } h1 { font-size:30px; } body { font-size:17px; }
+  .views { display:grid; grid-template-columns:.85fr 1.2fr 1fr; gap:8px; margin:20px 0; }
+  .views button { padding:8px 4px; font-size:15px; }
+  .data-columns,.calculation-grid { grid-template-columns:1fr; gap:26px; }
+  .summary { padding:10px 12px; gap:6px 10px; }
+  .summary>div { min-width:100px; }
+  .summary>div+div { padding-left:12px; }
+  .summary strong { font-size:22px; }
+  .stat-label { font-size:13px; }
+  #r-qualifier { display:block; font-size:13px; }
+  #within-summary { flex-basis:100%; border-left:0; border-top:1px solid var(--line); padding:6px 0 0; display:flex; align-items:center; gap:12px; }
+  #within-summary strong { font-size:18px; }
+  .counts-heading { flex-wrap:nowrap; }
+  .counts-heading h2 { font-size:23px; }
+  .counts-heading button { padding:8px 10px; }
+  .count-editor { gap:8px; }
+  .count-editor input { width:44px; }
+  .counts-table th .small { display:block; font-size:12px; }
+  .match-word { font-size:12px; }
+  .plot { max-width:480px; width:100%; margin:auto; }
+  .activity { padding-top:24px; }
+  .contribution { padding:16px; }
+  .path-controls button { flex:1; }
+  th,td { padding:8px 6px; }
+}
+@media(max-width:359px) { main { padding:16px 10px; } .count-editor { gap:4px; } .counts-table td,.counts-table th { padding:8px 2px; } .clip-button { min-width:38px; } h1 { font-size:28px; } .views button { font-size:14px; } .counts-heading { flex-wrap:wrap; } }
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important; animation:none !important; transition:none !important; } }
+@media(max-height:450px) { .summary { position:static; } html { scroll-padding-top:16px; } }
+@media print { .summary { position:static; } button,.views,.actions,.skip-link { display:none; } main { padding:0; } footer { break-inside:avoid; } }
+</style>
+</head>
+<body>
+<a href="#counts" class="skip-link">Skip to editable counts</a>
+<main>
+  <header>
+    <p class="small"><a href="https://brettreynolds.ca/#resources">Brett Reynolds · Teaching and research resources</a></p>
+    <p class="eyebrow">Interactive supplement / synthetic teaching example</p>
+    <h1>Same scores, different summaries</h1>
+    <p class="deck">Two observers counted events in four clips. Change B and see what each summary retains.</p>
+  </header>
+  <noscript><p class="notice">Enable JavaScript to edit the counts. The examples below remain readable: identical counts give r = 1 and four exact matches; adding one to every B count preserves r = 1 with no exact matches; reversing B gives r = −1 with no exact matches.</p></noscript>
+  <div class="views" role="tablist" aria-label="Activity">
+    <button id="tab-compare" role="tab" aria-selected="true" aria-controls="view-compare" data-view="compare">Compare</button>
+    <button id="tab-calculation" role="tab" aria-selected="false" aria-controls="view-calculation" tabindex="-1" data-view="calculation">Follow the calculation</button>
+    <button id="tab-backwards" role="tab" aria-selected="false" aria-controls="view-backwards" tabindex="-1" data-view="backwards">Work backwards</button>
+  </div>
+    <div id="summary" class="summary" role="region" aria-label="Current summaries">
+      <div><span class="stat-label">Pearson correlation</span><strong id="r-value">r = 1</strong> <span id="r-qualifier">(exact)</span></div>
+      <div><span class="stat-label">Exact matches</span><strong id="agreement-value">4/4 (100%)</strong></div>
+      <div id="within-summary" hidden><span class="stat-label">Within one count</span><strong id="within-value">4/4 (100%)</strong></div>
+      <p id="validity-note" class="validity-note" hidden>Summaries show the last valid counts. Correct the marked input.</p>
+    </div>
+  <section class="data-stage" aria-label="Shared current counts">
+    <div class="data-columns">
+      <section id="counts" tabindex="-1" aria-labelledby="counts-heading">
+        <div class="counts-heading"><div><h2 id="counts-heading">Current counts</h2><p id="current-vector" class="muted">B: 1, 2, 3, 4 · Same counts</p></div><button id="shift">Add 1 to B</button></div>
+        <p class="invitation" id="first-prompt">If every B count goes up by one, what happens to correlation and exact matches?</p>
+        <table class="counts-table"><caption class="sr-only">Event counts for four clips. Observer A is fixed; Observer B is editable.</caption>
+          <thead><tr><th scope="col">Clip</th><th scope="col">A <span class="small">fixed</span></th><th scope="col">B <span class="small">editable</span></th><th scope="col">Exact?</th></tr></thead>
+          <tbody id="count-rows"></tbody>
+        </table>
+        <p class="muted small">Teaching range: whole numbers 1–7. A is fixed to make comparisons easy. Neither observer is assumed to be correct.</p>
+        <div class="actions"><button id="reset">Reset B to 1, 2, 3, 4</button><button id="save">Save current example</button><button id="undo" disabled>Undo counts</button></div>
+        <p id="save-limit" class="small muted" hidden>Two examples are saved. Remove one below to save another.</p>
+        <div class="preset-block"><label for="preset">Load an example</label><select id="preset"></select></div>
+      </section>
+      <figure class="plot"><h2>Each point is one clip</h2><div id="plot"></div><figcaption id="plot-caption">The dashed line marks equal counts. Point numbers identify clips; a second ring marks an exact match.</figcaption></figure>
+    </div>
+    <p id="last-change" class="change-note">All four pairs match exactly.</p>
+    <label class="rule-toggle"><input id="within-toggle" type="checkbox"> Add within-one agreement: |A − B| ≤ 1</label>
+    <p id="rule-explanation" class="muted small" hidden>This counts a difference of one as agreement. It asks a different question; exact agreement is still shown.</p>
+  </section>
+
+  <section id="view-compare" class="activity" role="tabpanel" aria-labelledby="tab-compare" tabindex="0">
+    <h2>What changes when the counts change?</h2>
+    <p>Try the one-count shift, then reverse B's order. Correlation summarizes linear association after centring and scaling. Exact agreement counts the pairs with identical values.</p>
+    <p>A coefficient usually permits several sets of observations. Even when it identifies the counts within this teaching domain, it doesn't establish whether either observer's counts are accurate.</p>
+    <button class="text-button" data-go="calculation">Follow these counts through the formulas →</button>
+  </section>
+
+  <section id="view-calculation" class="activity" role="tabpanel" aria-labelledby="tab-calculation" tabindex="0" hidden>
+    <h2>Follow the calculation</h2>
+    <div class="path-controls" role="group" aria-label="Calculation path"><button id="path-correlation" aria-pressed="true" data-path="correlation">Follow correlation</button><button id="path-agreement" aria-pressed="false" data-path="agreement">Follow exact agreement</button></div>
+    <h3 id="step-heading"></h3><p id="step-intro"></p>
+    <div class="calculation-grid"><div id="ledger" class="table-scroll" tabindex="0" role="region" aria-label="Calculation table"></div><aside id="contribution" class="contribution" aria-label="Selected clip contribution"></aside></div>
+    <div id="formula-result" class="formula-result"></div>
+    <div class="actions"><button id="previous">Previous</button><button id="next">Next</button></div>
+    <details class="technical"><summary>The formulas and what they retain</summary>
+      <div class="formula-scroll" tabindex="0" role="region" aria-label="Pearson correlation formula">
+        <math display="block" aria-label="r equals the sum of centred A times centred B divided by the square root of the product of their two sums of squared deviations"><mrow><mi>r</mi><mo>=</mo><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>4</mn></munderover><mo>(</mo><msub><mi>A</mi><mi>i</mi></msub><mo>−</mo><mover><mi>A</mi><mo>¯</mo></mover><mo>)</mo><mo>(</mo><msub><mi>B</mi><mi>i</mi></msub><mo>−</mo><mover><mi>B</mi><mo>¯</mo></mover><mo>)</mo></mrow><msqrt><mrow><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>4</mn></munderover><msup><mrow><mo>(</mo><msub><mi>A</mi><mi>i</mi></msub><mo>−</mo><mover><mi>A</mi><mo>¯</mo></mover><mo>)</mo></mrow><mn>2</mn></msup><mo>×</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>4</mn></munderover><msup><mrow><mo>(</mo><msub><mi>B</mi><mi>i</mi></msub><mo>−</mo><mover><mi>B</mi><mo>¯</mo></mover><mo>)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mfrac></mrow></math>
+      </div>
+      <p>Correlation uses the sum of cross-products and both sums of squares. Adding a constant or multiplying by a positive constant throughout either series preserves r, when it is defined. Rescaling all counts is different from changing the sampled population's range.</p>
+      <p class="plain-formula">Exact agreement = 100 × (number of pairs with Aᵢ = Bᵢ) ÷ 4.</p>
+      <p>Each pair becomes 1 for a match or 0 for a mismatch. Totals of one, two, or three don't identify which clips matched. Zero means all pairs differ; four means all pairs match and B is identical to A. Mismatch sizes are discarded. Exact matching is the chosen rule for these integer counts.</p>
+    </details>
+  </section>
+
+  <section id="view-backwards" class="activity" role="tabpanel" aria-labelledby="tab-backwards" tabindex="0" hidden>
+    <h2>Work backwards from a summary</h2>
+    <p>Edit the counts above and save examples to compare them. A summary restricts the possibilities without usually identifying a unique dataset.</p>
+    <ol class="tasks">
+      <li><h3>Keep r exactly 1 and remove every exact match.</h3><p id="task-one"></p><details><summary>Show one solution</summary><button data-load="2,3,4,5">Load B: 2, 3, 4, 5</button></details></li>
+      <li><h3>Keep the match count and make a mismatch larger.</h3><p>Save a starting example, then change B while preserving its number of exact matches. Compare the largest absolute difference.</p><p id="task-two"></p><details><summary>Show a starting pair</summary><div class="actions"><button data-load="1,2,3,5">Load B: 1, 2, 3, 5</button><button data-load="1,2,3,7">Load B: 1, 2, 3, 7</button></div></details></li>
+      <li><h3>Find positive and negative correlations with two exact matches.</h3><p>Save one of each to see them together.</p><p id="task-three"></p><details><summary>Show one pair</summary><div class="actions"><button data-load="1,2,4,3">Load B: 1, 2, 4, 3</button><button data-load="4,2,3,1">Load B: 4, 2, 3, 1</button></div></details></li>
+    </ol>
+    <details id="enumeration" class="technical"><summary>All 2,401 possibilities in this teaching domain</summary>
+      <p>A stays (1, 2, 3, 4); each B count is an integer from 1 to 7. These are compatible possibilities. <strong>No probabilities have been assigned to them.</strong> The counts say nothing about how often such data occurs in research.</p>
+      <p id="enumeration-totals"></p><label for="witness-filter">Show examples compatible with</label><select id="witness-filter"><option value="positive">r exactly 1</option><option value="negative">r exactly −1</option><option value="two">Exactly two matches</option><option value="undefined">Undefined correlation</option><option value="four">Exactly four matches</option></select>
+      <p id="witness-count"></p><div id="witnesses"></div><div class="actions"><button id="witness-previous">Previous examples</button><button id="witness-next">Next examples</button></div>
+      <p class="small muted">Examples are listed in numerical order, without any likelihood ranking. Exact checks use integer sums before rounding. A published r rounded to two places permits additional values; this is not a solver for rounded published coefficients.</p>
+      <p>Four exact matches identify B uniquely here and imply r = 1 because A varies. Knowing r = 1 permits five different B vectors, with zero, one, or four exact matches.</p>
+    </details>
+  </section>
+
+  <section id="saved-section" class="saved-section" aria-labelledby="saved-heading" hidden><h2 id="saved-heading">Current and saved examples</h2><p>Saved examples stay unchanged as you edit. Loading one copies it into the current counts.</p><div id="saved-table" class="table-scroll" tabindex="0" role="region" aria-label="Current and saved comparison"></div><p id="saved-comparison"></p></section>
+  <footer><p>Supplement to <cite>What generalizes in reliability generalization?</cite> · Brett Reynolds · Version <span id="version">1.0.0</span></p><p>These four pairs are constructed examples, not observations from engagement research. The page illustrates properties of summaries; it does not assess measurement adequacy.</p><p><a id="offline-download" href="index.html" download="correlation-and-agreement-1.0.0.html">Download the offline page</a> <span class="muted">· No account or connection needed after download</span></p></footer>
+</main>
+<div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+<script>/* Pure calculations for the four-clip teaching domain. No empirical data. */
+(function (root) {
+  'use strict';
+  const A = Object.freeze([1, 2, 3, 4]);
+  const VERSION = '1.0.0';
+  const presets = Object.freeze([
+    {name: 'Same counts', b: [1, 2, 3, 4]},
+    {name: 'B is one higher', b: [2, 3, 4, 5]},
+    {name: 'Reverse order', b: [4, 3, 2, 1]},
+    {name: 'Stretch B', b: [1, 3, 5, 7]},
+    {name: 'Constant B', b: [2, 2, 2, 2]},
+    {name: 'Three matches, difference 1', b: [1, 2, 3, 5]},
+    {name: 'Three matches, difference 3', b: [1, 2, 3, 7]},
+    {name: 'Two matches, positive r', b: [1, 2, 4, 3]},
+    {name: 'Two matches, negative r', b: [4, 2, 3, 1]}
+  ].map(p => Object.freeze({name: p.name, b: Object.freeze(p.b)})));
+
+  function validate(b) {
+    if (!Array.isArray(b) || b.length !== 4 ||
+        !b.every(v => Number.isInteger(v) && v >= 1 && v <= 7)) {
+      throw new RangeError('Use four whole-number counts from 1 to 7.');
+    }
+  }
+
+  function measure(b) {
+    validate(b);
+    const sumB = b.reduce((s, x) => s + x, 0);
+    const meanA = 2.5, meanB = sumB / 4;
+    const rows = A.map((a, i) => {
+      const da4 = 4 * a - 10, db4 = 4 * b[i] - sumB;
+      return {clip: i + 1, a, b: b[i], da: da4 / 4, db: db4 / 4,
+        product: da4 * db4 / 16, aa: da4 * da4 / 16,
+        bb: db4 * db4 / 16, difference: b[i] - a,
+        match: a === b[i], within: Math.abs(b[i] - a) <= 1,
+        da4, db4};
+    });
+    // Four times each centred value is an integer. All exact target checks
+    // use these integer sums, never a tolerance or rounded correlation.
+    const c = rows.reduce((s, x) => s + x.da4 * x.db4, 0);
+    const qa = rows.reduce((s, x) => s + x.da4 * x.da4, 0);
+    const qb = rows.reduce((s, x) => s + x.db4 * x.db4, 0);
+    const r = qb === 0 ? null : c / Math.sqrt(qa * qb);
+    return {b: [...b], rows, meanA, meanB, sumB, c, qa, qb, r,
+      sab: c / 16, saa: qa / 16, sbb: qb / 16,
+      perfect: qb > 0 && c * c === qa * qb ? Math.sign(c) : 0,
+      matches: rows.filter(x => x.match).length,
+      within: rows.filter(x => x.within).length,
+      maxDifference: Math.max(...rows.map(x => Math.abs(x.difference)))};
+  }
+
+  function sameCorrelation(left, right) {
+    const x = measure(left), y = measure(right);
+    if (x.r === null || y.r === null) return false;
+    return Math.sign(x.c) === Math.sign(y.c) && x.c * x.c * y.qb === y.c * y.c * x.qb;
+  }
+
+  function gcd(a, b) { return b ? gcd(b, a % b) : a; }
+  function number(x) { return String(Object.is(x, -0) ? 0 : x).replace('-', '−'); }
+  function correlation(m) {
+    if (m.r === null) return {value: 'undefined', qualifier: "B's counts do not vary", speech: "Correlation is undefined because B's counts do not vary."};
+    const denominator = Math.sqrt(m.qa * m.qb);
+    if (Number.isInteger(denominator)) {
+      const divisor = gcd(Math.abs(m.c), denominator);
+      let d = denominator / divisor;
+      while (d % 2 === 0) d /= 2;
+      while (d % 5 === 0) d /= 5;
+      const value = d === 1 ? number(m.r) : `${number(m.c / divisor)}/${denominator / divisor}`;
+      return {value: `= ${value}`, qualifier: 'exact', speech: `Correlation equals ${value}, exactly.`};
+    }
+    const value = m.r.toFixed(3).replace('-', '−');
+    return {value: `≈ ${value}`, qualifier: 'rounded', speech: `Correlation is approximately ${value}, rounded.`};
+  }
+
+  function enumerate() {
+    const all = [];
+    for (let a = 1; a <= 7; a++) for (let b = 1; b <= 7; b++)
+      for (let c = 1; c <= 7; c++) for (let d = 1; d <= 7; d++) all.push(measure([a, b, c, d]));
+    return all;
+  }
+
+  const api = Object.freeze({A, VERSION, presets, validate, measure, sameCorrelation, correlation, number, enumerate});
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.ReliabilityDemo = api;
+})(globalThis);
+</script>
+<script>(function () {
+  'use strict';
+  const M = globalThis.ReliabilityDemo;
+  const $ = id => document.getElementById(id);
+  // Capture the original self-contained page before any interactive mutations.
+  // This also makes download work when a previously downloaded file is renamed.
+  const offlineURL = URL.createObjectURL(new Blob(['<!doctype html>\n' + document.documentElement.outerHTML], {type:'text/html;charset=utf-8'}));
+  $('offline-download').href = offlineURL;
+  const n = M.number;
+  const state = {b: [1, 2, 3, 4], undo: [], saved: [], selected: null,
+    view: 'compare', path: 'correlation', steps: {correlation: 0, agreement: 0},
+    within: false, invalid: new Set(), witnessPage: 0, enumeration: null};
+  let announcementTimer;
+  const same = (x, y) => x.every((v, i) => v === y[i]);
+  const vector = b => b.join(', ');
+  const agreement = count => `${count}/4 (${count * 25}%)`;
+  const rText = m => { const f = M.correlation(m); return `r ${f.value} (${f.qualifier})`; };
+
+  function announce(message) {
+    clearTimeout(announcementTimer);
+    announcementTimer = setTimeout(() => { $('live').textContent = message; }, 300);
+  }
+  function summarySpeech(m) {
+    return `${M.correlation(m).speech} Exact matches ${m.matches} of 4.${state.within ? ` Within one count: ${m.within} of 4.` : ''}`;
+  }
+
+  $('count-rows').innerHTML = M.A.map((a, i) => `<tr id="row-${i}">
+    <th scope="row"><button class="clip-button" data-clip="${i}" aria-label="Select clip ${i + 1}" aria-pressed="false">${i + 1}</button></th>
+    <td>${a}</td><td><div class="count-editor"><button data-adjust="${i},-1" aria-label="Decrease B for clip ${i + 1}">−</button><input id="b-${i}" type="number" min="1" max="7" step="1" inputmode="numeric" value="${a}" aria-label="Observer B, clip ${i + 1} count" aria-describedby="error-${i}"><button data-adjust="${i},1" aria-label="Increase B for clip ${i + 1}">+</button></div><p id="error-${i}" class="input-error" hidden>Use a whole number from 1 to 7.</p></td>
+    <td id="match-${i}"></td></tr>`).join('');
+  $('preset').innerHTML = '<option value="custom" disabled>Your counts</option>' + M.presets.map((p, i) => `<option value="${i}">${p.name} (${vector(p.b)})</option>`).join('');
+  $('version').textContent = M.VERSION;
+
+  function setCounts(b, action = 'Counts changed', record = true) {
+    M.validate(b);
+    const before = M.measure(state.b);
+    if (!same(b, state.b) && record) state.undo.push([...state.b]);
+    state.b = [...b];
+    state.invalid.clear();
+    const after = M.measure(b);
+    $('first-prompt').hidden = true;
+    if (M.sameCorrelation(before.b, b) && before.matches !== after.matches) {
+      $('last-change').textContent = `The correlation is unchanged. Exact matches changed from ${before.matches} to ${after.matches} of 4.`;
+    } else {
+      $('last-change').textContent = `${action}. ${rText(after)}; ${after.matches} of 4 pairs match exactly.`;
+    }
+    render();
+    announce(`B is ${vector(b)}. ${summarySpeech(after)}`);
+  }
+
+  function setOneCount(i, value) {
+    const b = [...state.b]; b[i] = value;
+    const remainingInvalid = new Set(state.invalid); remainingInvalid.delete(i);
+    const invalidText = [...remainingInvalid].map(j => [j, $('b-' + j).value]);
+    setCounts(b, `Clip ${i + 1} changed`);
+    state.invalid = remainingInvalid;
+    invalidText.forEach(([j, text]) => { $('b-' + j).value = text; });
+    render();
+    if (remainingInvalid.size) announce(`Clip ${i + 1} changed to ${value}. Correct the other marked input; summaries still use its last valid count.`);
+  }
+
+  function render() {
+    const m = M.measure(state.b), f = M.correlation(m);
+    $('r-value').textContent = `r ${f.value}`;
+    $('r-qualifier').textContent = `(${f.qualifier})`;
+    $('agreement-value').textContent = agreement(m.matches);
+    $('within-value').textContent = agreement(m.within);
+    $('within-summary').hidden = !state.within;
+    $('rule-explanation').hidden = !state.within;
+    $('validity-note').hidden = state.invalid.size === 0;
+    const presetIndex = M.presets.findIndex(p => same(p.b, state.b));
+    $('current-vector').textContent = `B: ${vector(state.b)} · ${presetIndex < 0 ? 'Your counts' : M.presets[presetIndex].name}`;
+    $('preset').value = presetIndex < 0 ? 'custom' : String(presetIndex);
+    m.rows.forEach((row, i) => {
+      if (!state.invalid.has(i)) $('b-' + i).value = row.b;
+      $('b-' + i).setAttribute('aria-invalid', String(state.invalid.has(i)));
+      $('error-' + i).hidden = !state.invalid.has(i);
+      $(`row-${i}`).classList.toggle('selected-row', state.selected === i);
+      $(`row-${i}`).querySelector('[data-clip]').setAttribute('aria-pressed', String(state.selected === i));
+      document.querySelector(`[data-adjust="${i},-1"]`).disabled = row.b === 1;
+      document.querySelector(`[data-adjust="${i},1"]`).disabled = row.b === 7;
+      $(`match-${i}`).innerHTML = `<span class="match-symbol" aria-hidden="true">${row.match ? '=' : '≠'}</span><span class="match-word">${row.match ? 'match' : 'different'}</span>`;
+    });
+    $('undo').disabled = state.undo.length === 0;
+    $('save').disabled = state.saved.length >= 2 || state.invalid.size > 0;
+    $('save-limit').hidden = state.saved.length < 2;
+    renderPlot(m);
+    renderCalculation(m);
+    renderSaved(m);
+    renderTasks(m);
+  }
+
+  function renderPlot(m) {
+    const lo = 58, hi = 418, unit = (hi - lo) / 8;
+    const x = a => lo + a * unit, y = b => hi - b * unit;
+    let grid = '';
+    for (let i = 0; i <= 8; i++) grid += `<path d="M ${x(i)} ${lo} V ${hi} M ${lo} ${y(i)} H ${hi}" stroke="#d6d0c4" stroke-width="1"/><text x="${x(i)}" y="${hi + 24}" text-anchor="middle">${i}</text><text x="${lo - 16}" y="${y(i) + 5}" text-anchor="end">${i}</text>`;
+    const points = m.rows.map((row, i) => `<g class="point" role="button" tabindex="0" data-clip="${i}" aria-label="Clip ${i + 1}: A ${row.a}, B ${row.b}, ${row.match ? 'exact match' : 'different counts'}" aria-pressed="${state.selected === i}">
+      ${state.selected === i ? `<circle cx="${x(row.a)}" cy="${y(row.b)}" r="22" fill="none" stroke="#6b1f2a" stroke-width="3"/>` : ''}
+      ${row.match ? `<circle cx="${x(row.a)}" cy="${y(row.b)}" r="18" fill="#fbf9f4" stroke="#1c1917" stroke-width="2"/>` : ''}
+      <circle cx="${x(row.a)}" cy="${y(row.b)}" r="13" fill="#1c1917"/><text x="${x(row.a)}" y="${y(row.b) + 5}" fill="white" font-weight="650" text-anchor="middle">${i + 1}</text></g>`).join('');
+    $('plot').innerHTML = `<svg viewBox="0 0 480 480" role="group" aria-labelledby="plot-title plot-desc" xmlns="http://www.w3.org/2000/svg"><title id="plot-title">Counts from observers A and B</title><desc id="plot-desc">${m.rows.map(row => `Clip ${row.clip}: A ${row.a}, B ${row.b}, ${row.match ? 'exact match' : 'different'}.`).join(' ')} The dashed line is A equals B. Both axes run from zero to eight; counts may be one to seven.</desc><g font-family="system-ui,sans-serif" font-size="14" fill="#57534e"><text x="${lo}" y="28">Observer B's count</text>${grid}<path d="M ${lo} ${lo} V ${hi} H ${hi}" stroke="#8a8378" fill="none" stroke-width="2"/><path d="M ${lo} ${hi} L ${hi} ${lo}" stroke="#8a8378" stroke-width="2" stroke-dasharray="7 5"/><text x="${hi - 8}" y="${hi - 14}" text-anchor="end">Dashed line: A = B</text><text x="238" y="472" text-anchor="middle">Observer A's count</text>${points}</g></svg>`;
+  }
+
+  const correlationSteps = ['Find the means', 'Subtract each mean', 'Multiply the deviations', 'Square and sum the deviations', 'Normalize with all three sums'];
+  const agreementSteps = ['Compare the counts', 'Mark each exact match', 'Count the matches'];
+  function renderCalculation(m) {
+    const path = state.path, step = state.steps[path];
+    const titles = path === 'correlation' ? correlationSteps : agreementSteps;
+    $('step-heading').textContent = `Step ${step + 1} of ${titles.length} · ${titles[step]}`;
+    $('previous').disabled = step === 0;
+    $('next').disabled = step === titles.length - 1;
+    $('next').textContent = step === titles.length - 1 ? 'Calculation complete' : 'Next';
+    const final = step === titles.length - 1;
+    let headings, cells, result, intro;
+    if (path === 'correlation') {
+      intro = `Means: A = ${n(m.meanA)} and B = ${n(m.meanB)}. Select a clip to follow its contribution.`;
+      if (step === 0) { headings = ['A', 'B']; cells = r => [r.a, r.b]; result = `Mean A = 10 ÷ 4 = 2.5. Mean B = ${m.sumB} ÷ 4 = ${n(m.meanB)}.`; }
+      if (step === 1) { headings = [`A − ${n(m.meanA)}`, `B − ${n(m.meanB)}`]; cells = r => [r.da, r.db]; result = 'Each count is now expressed as a deviation from its own observer’s mean.'; }
+      if (step === 2) { headings = [`A − ${n(m.meanA)}`, `B − ${n(m.meanB)}`, 'Product']; cells = r => [r.da, r.db, r.product]; result = `Sum of products = ${n(m.sab)}. Next, calculate both sums of squared deviations. The final r uses all three sums.`; }
+      if (step === 3) { headings = ['A deviation²', 'B deviation²']; cells = r => [r.aa, r.bb]; result = `Sum of A squares = ${n(m.saa)}. Sum of B squares = ${n(m.sbb)}. Sum of cross-products = ${n(m.sab)}.`; }
+      if (final) {
+        intro = 'The three sums now become one coefficient. Individual clip terms no longer appear separately.';
+        const f = M.correlation(m);
+        result = m.r === null ? `r = ${n(m.sab)} ÷ √(${n(m.saa)} × 0). Division by zero is undefined because B's counts do not vary.` : `r = ${n(m.sab)} ÷ √(${n(m.saa)} × ${n(m.sbb)}) ${f.value} (${f.qualifier}).`;
+      }
+    } else {
+      intro = 'Compare each pair directly. A match contributes 1; any mismatch contributes 0.';
+      if (step === 0) { headings = ['A', 'B', 'B − A']; cells = r => [r.a, r.b, r.difference]; result = 'The difference tells us whether the two counts are equal.'; }
+      if (step === 1) { headings = ['A', 'B', 'Equal? (1/0)']; cells = r => [r.a, r.b, r.match ? '1 · match' : '0 · different']; result = 'Each pair becomes an indicator. Differences of one and three both contribute 0 under exact agreement.'; }
+      if (final) {
+        intro = m.matches === 4 ? 'All four pairs match, so B is identical to A.' : m.matches === 0 ? 'All four pairs differ. The total does not tell us the sizes of those differences.' : 'The indicators become a total. This total does not identify which clips matched or the mismatch sizes.';
+        result = `Exact agreement = 100 × (${m.rows.map(r => r.match ? 1 : 0).join(' + ')}) ÷ 4 = ${m.matches * 25}%. There are ${m.matches} exact matches out of 4.`;
+      }
+      if (state.within) result += ` With the additional within-one rule, the indicators are ${m.rows.map(r => r.within ? 1 : 0).join(', ')}, giving ${agreement(m.within)}.`;
+    }
+    $('step-intro').textContent = intro;
+    if (final) {
+      $('ledger').innerHTML = path === 'correlation' ? `<table><caption>Totals across all four clips</caption><tbody><tr><th scope="row">Sum of cross-products</th><td>${n(m.sab)}</td></tr><tr><th scope="row">Sum of A squares</th><td>${n(m.saa)}</td></tr><tr><th scope="row">Sum of B squares</th><td>${n(m.sbb)}</td></tr></tbody></table>` : `<table><caption>Totals across all four clips</caption><tbody><tr><th scope="row">Exact matches</th><td>${m.matches} of 4</td></tr>${state.within ? `<tr><th scope="row">Within one count</th><td>${m.within} of 4</td></tr>` : ''}</tbody></table>`;
+      $('contribution').innerHTML = '<h3>One summary of four pairs</h3><p>Use Work backwards to see whether a summary identifies one example or permits several.</p>';
+    } else {
+      $('ledger').innerHTML = `<table><caption class="sr-only">${titles[step]} for four clips</caption><thead><tr><th scope="col">Clip</th>${headings.map(h => `<th scope="col">${h}</th>`).join('')}</tr></thead><tbody>${m.rows.map((row, i) => `<tr class="${state.selected === i ? 'selected-row' : ''}"><th scope="row"><button class="clip-button" data-clip="${i}" aria-label="Select clip ${i + 1} in calculation" aria-pressed="${state.selected === i}">${i + 1}</button></th>${cells(row).map(v => `<td>${typeof v === 'number' ? n(v) : v}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+      if (state.selected === null) $('contribution').innerHTML = '<h3>Follow one clip</h3><p>Select a numbered row or point. Its current contribution will appear here.</p>';
+      else {
+        const r = m.rows[state.selected];
+        let explanation;
+        if (path === 'agreement') explanation = `${r.a} ${r.match ? '=' : '≠'} ${r.b}: ${r.match ? '1 (match)' : '0 (different)'}. The difference B − A is ${n(r.difference)}.`;
+        else if (step === 0) explanation = `A contributes ${r.a} to a total of 10. B contributes ${r.b} to a total of ${m.sumB}. Each total is divided by 4.`;
+        else if (step === 1) explanation = `${r.a} − ${n(m.meanA)} = ${n(r.da)}; ${r.b} − ${n(m.meanB)} = ${n(r.db)}.`;
+        else if (step === 2) explanation = `(${n(r.da)}) × (${n(r.db)}) = ${n(r.product)}.`;
+        else explanation = `(${n(r.da)})² = ${n(r.aa)}; (${n(r.db)})² = ${n(r.bb)}.`;
+        $('contribution').innerHTML = `<h3>Selected: clip ${r.clip}</h3><p class="arithmetic">${explanation}</p><p>Each term still refers to a clip here. In the final sum, these terms no longer appear separately.</p>`;
+      }
+    }
+    $('formula-result').textContent = result;
+  }
+
+  function renderSaved(current) {
+    $('saved-section').hidden = state.saved.length === 0;
+    if (!state.saved.length) { $('saved-table').replaceChildren(); $('saved-comparison').textContent = ''; return; }
+    const metrics = [current, ...state.saved.map(M.measure)];
+    const row = (label, fn) => `<tr><th scope="row">${label}</th>${metrics.map(m => `<td>${fn(m)}</td>`).join('')}</tr>`;
+    $('saved-table').innerHTML = `<table><caption class="sr-only">Comparison of current counts with fixed saved snapshots</caption><thead><tr><th scope="col">Quantity</th><th scope="col">Current<span class="saved-label">Changes as you edit</span></th>${state.saved.map(b => `<th scope="col">Saved (${vector(b)})<span class="saved-label">Fixed snapshot</span></th>`).join('')}</tr></thead><tbody>${row('B counts', m => vector(m.b))}${row('Pearson correlation', rText)}${row('Exact matches', m => agreement(m.matches))}${state.within ? row('Within one count', m => agreement(m.within)) : ''}${row('Largest |B − A|', m => m.maxDifference)}<tr><th scope="row">Actions</th><td>Editing above</td>${state.saved.map((b, i) => `<td><div class="actions"><button data-restore="${i}" aria-label="Load saved ${vector(b)} into current">Load into current</button><button data-remove="${i}" aria-label="Remove saved ${vector(b)}">Remove</button></div></td>`).join('')}</tr></tbody></table>`;
+    const messages = state.saved.map(b => {
+      if (same(b, state.b)) return `Saved (${vector(b)}) currently has the same counts.`;
+      if (M.sameCorrelation(b, state.b)) return `Saved (${vector(b)}) has exactly the same r with different counts.`;
+      const a = M.measure(b), c = current;
+      if (a.r !== null && c.r !== null && a.r.toFixed(3) === c.r.toFixed(3)) return `Saved (${vector(b)}) rounds to the same displayed r, but the exact values differ.`;
+      return `Saved (${vector(b)}) has ${a.matches === c.matches ? 'the same' : 'a different'} exact match count.`;
+    });
+    $('saved-comparison').textContent = messages.join(' ');
+  }
+
+  function renderTasks(m) {
+    const one = m.perfect === 1 && m.matches === 0;
+    $('task-one').textContent = `${one ? '● Meets both conditions.' : '○ Keep exploring.'} Current: ${rText(m)}; ${m.matches} exact matches.`;
+    const base = state.saved.map(M.measure).find(s => s.matches === m.matches && s.maxDifference < m.maxDifference);
+    $('task-two').textContent = base ? `● Compared with saved (${vector(base.b)}), exact matches stay at ${m.matches}, and the largest difference rises from ${base.maxDifference} to ${m.maxDifference}.` : '○ Save a baseline, then preserve its match count while increasing the largest difference.';
+    const saved = state.saved.map(M.measure);
+    const positive = saved.some(s => s.matches === 2 && s.c > 0 && s.qb > 0);
+    const negative = saved.some(s => s.matches === 2 && s.c < 0 && s.qb > 0);
+    $('task-three').textContent = `${positive && negative ? '● Both saved examples found.' : '○ Keep exploring.'} Two matches with positive r: ${positive ? 'saved' : 'not yet saved'}. Two matches with negative r: ${negative ? 'saved' : 'not yet saved'}.`;
+  }
+
+  function renderWitnesses() {
+    if (!state.enumeration) state.enumeration = M.enumerate();
+    const all = state.enumeration;
+    const filters = {positive: m => m.perfect === 1, negative: m => m.perfect === -1,
+      two: m => m.matches === 2, undefined: m => m.r === null, four: m => m.matches === 4};
+    $('enumeration-totals').textContent = `${all.length.toLocaleString('en')} combinations: ${all.filter(filters.positive).length} have r = 1; ${all.filter(filters.negative).length} have r = −1; ${all.filter(filters.undefined).length} have undefined r; ${all.filter(filters.two).length} have exactly two matches.`;
+    const matches = all.filter(filters[$('witness-filter').value]);
+    const pageSize = 6, start = state.witnessPage * pageSize;
+    $('witness-count').textContent = `${matches.length} compatible examples. Showing ${start + 1}–${Math.min(start + pageSize, matches.length)} in numerical order.`;
+    $('witnesses').innerHTML = matches.slice(start, start + pageSize).map(m => `<div class="witness"><span>B: ${vector(m.b)}<br>${rText(m)} · ${m.matches} exact ${m.matches === 1 ? 'match' : 'matches'}</span><button data-load="${m.b.join(',')}" aria-label="Load compatible B ${vector(m.b)}">Load</button></div>`).join('');
+    $('witness-previous').disabled = start === 0;
+    $('witness-next').disabled = start + pageSize >= matches.length;
+  }
+
+  function setView(view, focus = false) {
+    state.view = view;
+    for (const name of ['compare', 'calculation', 'backwards']) {
+      $(`tab-${name}`).setAttribute('aria-selected', String(name === view));
+      $(`tab-${name}`).tabIndex = name === view ? 0 : -1;
+      $(`view-${name}`).hidden = name !== view;
+    }
+    if (focus) { $(`view-${view}`).focus({preventScroll: true}); $(`view-${view}`).scrollIntoView({block:'start'}); }
+  }
+
+  // Keep the actual input nodes in place so editing, focus and assistive
+  // technology do not lose their position when other displays are refreshed.
+  for (let i = 0; i < 4; i++) {
+    $('b-' + i).addEventListener('input', event => {
+      const raw = event.target.value, value = Number(raw);
+      if (raw.trim() === '' || !Number.isInteger(value) || value < 1 || value > 7) {
+        state.invalid.add(i); render(); announce(`Clip ${i + 1}: use a whole number from 1 to 7. Summaries show the last valid counts.`);
+      } else {
+        setOneCount(i, value);
+      }
+    });
+  }
+
+  document.addEventListener('click', event => {
+    const control = event.target.closest('button,[data-clip]');
+    if (!control || control.disabled) return;
+    if (control.dataset.adjust) {
+      const [i, delta] = control.dataset.adjust.split(',').map(Number);
+      setOneCount(i, state.b[i] + delta);
+    } else if (control.dataset.clip !== undefined) {
+      const i = Number(control.dataset.clip);
+      const inPlot = Boolean(control.closest('svg')), inLedger = Boolean(control.closest('#ledger'));
+      state.selected = state.selected === i ? null : i;
+      render();
+      if (inPlot) $('plot').querySelector(`[data-clip="${i}"]`).focus({preventScroll:true});
+      if (inLedger) $('ledger').querySelector(`[data-clip="${i}"]`)?.focus({preventScroll:true});
+      announce(state.selected === null ? 'Clip selection cleared.' : `Clip ${i + 1} selected. A ${M.A[i]}, B ${state.b[i]}.`);
+    } else if (control.dataset.view) setView(control.dataset.view);
+    else if (control.dataset.go) setView(control.dataset.go, true);
+    else if (control.dataset.path) {
+      state.path = control.dataset.path;
+      for (const path of ['correlation', 'agreement']) $('path-' + path).setAttribute('aria-pressed', String(path === state.path));
+      renderCalculation(M.measure(state.b));
+      announce($('step-heading').textContent);
+    } else if (control.dataset.load) setCounts(control.dataset.load.split(',').map(Number), 'Example loaded');
+    else if (control.dataset.restore !== undefined) {
+      const i = Number(control.dataset.restore);
+      setCounts(state.saved[i], 'Saved example loaded');
+      $('saved-table').querySelector(`[data-restore="${i}"]`).focus({preventScroll:true});
+    }
+    else if (control.dataset.remove !== undefined) {
+      const index = Number(control.dataset.remove), removed = state.saved[index];
+      state.saved.splice(index, 1); render();
+      const next = $('saved-table').querySelector('[data-remove]');
+      (next || $('save')).focus();
+      announce(`Removed saved (${vector(removed)}).`);
+    }
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && state.selected !== null) {
+      const selected = state.selected;
+      const restore = event.target.closest('svg,#ledger');
+      state.selected = null; render();
+      if (restore) $(`row-${selected}`).querySelector('[data-clip]').focus({preventScroll:true});
+      announce('Clip selection cleared.');
+    }
+    const target = event.target;
+    if (target.matches('g[data-clip]') && ['Enter', ' '].includes(event.key)) { event.preventDefault(); target.dispatchEvent(new MouseEvent('click', {bubbles:true})); }
+    if (target.getAttribute('role') === 'tab' && ['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
+      event.preventDefault();
+      const views = ['compare', 'calculation', 'backwards'];
+      let i = views.indexOf(state.view);
+      i = event.key === 'Home' ? 0 : event.key === 'End' ? 2 : (i + (event.key === 'ArrowRight' ? 1 : 2)) % 3;
+      setView(views[i]); $('tab-' + views[i]).focus();
+    }
+  });
+  $('shift').addEventListener('click', () => {
+    if (state.invalid.size) { $('last-change').textContent = 'Correct the marked input before adding 1 to every count.'; announce($('last-change').textContent); return; }
+    if (state.b.some(x => x === 7)) { $('last-change').textContent = 'Adding 1 would exceed the teaching range of 1–7. Counts were left as they were.'; announce($('last-change').textContent); return; }
+    setCounts(state.b.map(x => x + 1), 'Added 1 to every B count');
+  });
+  $('reset').addEventListener('click', () => setCounts([...M.A], 'Counts reset'));
+  $('undo').addEventListener('click', () => { if (state.undo.length) setCounts(state.undo.pop(), 'Count change undone', false); });
+  $('preset').addEventListener('change', () => { const p = M.presets[Number($('preset').value)]; if (p) setCounts(p.b, p.name); });
+  $('save').addEventListener('click', () => {
+    if (state.saved.length >= 2 || state.invalid.size) return;
+    state.saved.push([...state.b]); render();
+    if (state.saved.length === 2) (state.undo.length ? $('undo') : $('reset')).focus({preventScroll:true});
+    announce(`Saved (${vector(state.b)}). This snapshot will stay unchanged as you edit.`);
+  });
+  $('within-toggle').addEventListener('change', () => { state.within = $('within-toggle').checked; render(); announce(state.within ? `Added within-one agreement. ${summarySpeech(M.measure(state.b))}` : 'Within-one agreement hidden. Exact agreement remains.'); });
+  $('previous').addEventListener('click', () => { state.steps[state.path]--; renderCalculation(M.measure(state.b)); announce($('step-heading').textContent); });
+  $('next').addEventListener('click', () => { state.steps[state.path]++; renderCalculation(M.measure(state.b)); announce($('step-heading').textContent); });
+  $('enumeration').addEventListener('toggle', () => { if ($('enumeration').open) renderWitnesses(); });
+  $('witness-filter').addEventListener('change', () => { state.witnessPage = 0; renderWitnesses(); announce($('witness-count').textContent); });
+  $('witness-previous').addEventListener('click', () => { state.witnessPage--; renderWitnesses(); announce($('witness-count').textContent); });
+  $('witness-next').addEventListener('click', () => { state.witnessPage++; renderWitnesses(); announce($('witness-count').textContent); });
+  render();
+  new ResizeObserver(entries => {
+    document.documentElement.style.setProperty('--summary-height', `${entries[0].target.offsetHeight}px`);
+  }).observe($('summary'));
+})();
+</script>
+</body>
+</html>

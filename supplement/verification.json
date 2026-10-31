@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "datasets_checked": 2401,
+  "exact_comparisons_checked": 2401,
+  "invalid_vectors_rejected": 8,
+  "enumeration_counts": {
+    "positive": 5,
+    "negative": 5,
+    "undefined": 7,
+    "two_matches": 216,
+    "four_matches": 1
+  },
+  "standalone_html_sha256": "36689aead4e008a07fcdc699c0c692dcfa64a630d65c7bb186f17ed3019f310d",
+  "status": "PASS"
+}
