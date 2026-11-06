@@ -2,6 +2,8 @@
 
 Brett Reynolds, Humber Polytechnic & University of Toronto. Preprint, November 2026.
 
+Submitted to *Research Methods in Applied Linguistics* as a Brief Report on 6 November 2026. This repository contains the preprint version and its reproducible materials.
+
 A short methods response to Shujing Zhao and Luke Plonsky, "A reliability generalization meta-analysis in task engagement research", *Research Methods in Applied Linguistics* 5 (2026), 100386, https://doi.org/10.1016/j.rmal.2026.100386.
 
 ## Abstract
